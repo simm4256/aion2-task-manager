@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/aion2-task-manager/dev-sw.js?dev-sw', { scope: '/aion2-task-manager/', type: 'classic' })

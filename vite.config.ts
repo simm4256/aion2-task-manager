@@ -31,6 +31,9 @@ export default defineConfig({
             type: 'image/svg+xml'
           }
         ]
+      },
+      devOptions: { // ADD THIS BLOCK
+        enabled: true, // Enable PWA in dev mode
       }
     })
   ],
