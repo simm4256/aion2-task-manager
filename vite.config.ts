@@ -18,6 +18,7 @@ export default defineConfig({
         short_name: 'Aion2 Tasks',
         description: '아이온2 일일/주간 숙제 관리 툴',
         theme_color: '#000000',
+        start_url: '/aion2-task-manager/', // ADDED
         icons: [
           {
             src: 'pwa-192x192.svg',
