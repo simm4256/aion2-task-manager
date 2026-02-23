@@ -302,10 +302,10 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
         <button onClick={() => setShowTaskDefinitionForm(true)} className="add-task-definition-btn">숙제 추가</button>
       </div>
 
-      {characters.length === 0 && <p className="no-characters-for-homework">캐릭터를 추가해주세요.</p>}
+
       {allTaskDefs.length === 0 && <p className="no-tasks-for-homework">숙제를 추가해주세요.</p>}
 
-      {characters.length > 0 && allTaskDefs.length > 0 && (
+      {allTaskDefs.length > 0 && (
         <div className="homework-table-wrapper">
           <div className="homework-table-container">
             <table>
@@ -355,7 +355,14 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {characters.map(character => (
+                {characters.length === 0 ? (
+                  <tr>
+                    <td colSpan={allTaskDefs.length + 1} className="no-characters-message" onClick={() => setShowCharacterForm(true)}>
+                      캐릭터를 추가해주세요.
+                    </td>
+                  </tr>
+                ) : (
+                  characters.map(character => (
                   <tr
                     key={character.id}
                     onDragOver={(e) => handleDragOverCharacter(e, character.id)}
@@ -371,8 +378,8 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                     <td
                       className="character-name-cell"
                       onClick={() => handleCharacterNameClick(character)}
-                      draggable="true" /* Only this cell is draggable */
-                      onDragStart={(e) => handleDragStartCharacter(e, character.id)} /* Only this cell starts the drag */
+                      draggable="true"
+                      onDragStart={(e) => handleDragStartCharacter(e, character.id)}
                     >
                       <div className="character-name-content">
                         {editingCharacterId === character.id ? (
@@ -446,7 +453,8 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                       </td>
                     ))}
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>

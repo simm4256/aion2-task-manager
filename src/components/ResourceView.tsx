@@ -187,7 +187,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
 
   const handleDragOverCharacter = (e: React.DragEvent<HTMLTableRowElement>, targetCharacterId: string) => {
     e.preventDefault();
-    if (!draggedCharacterId || draggedCharacterId === targetCharacterId) {
+    if (!draggedCharacterId) {
       return;
     }
 
@@ -240,10 +240,9 @@ const ResourceView: React.FC<ResourceViewProps> = ({
         <button onClick={() => setShowResourceDefinitionForm(true)} className="add-task-definition-btn">자원 추가</button>
       </div>
 
-      {characters.length === 0 && <p className="no-characters-for-resource">캐릭터를 추가해주세요.</p>}
       {allResourceDefs.length === 0 && <p className="no-resources">자원을 추가해주세요.</p>}
 
-      {characters.length > 0 && allResourceDefs.length > 0 && (
+      {allResourceDefs.length > 0 && (
         <div className="resource-table-wrapper homework-table-wrapper">
           <div className="resource-table-container homework-table-container">
             <table>
@@ -293,67 +292,74 @@ const ResourceView: React.FC<ResourceViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {characters.map(character => (
-                  <tr
-                    key={character.id}
-                    onDragOver={(e) => handleDragOverCharacter(e, character.id)}
-                    onDrop={handleDropCharacter}
-                    onDragLeave={handleDragLeaveCharacter}
-                    onDragEnd={handleDragEndCharacter}
-                    className={draggedCharacterId === character.id ? 'dragging-character-row' : dragOverCharacterId === character.id ? 'drag-over-character-row' : ''}
-                  >
-                    <td
-                      className="character-name-cell"
-                      onClick={() => handleCharacterNameClick(character)}
-                      draggable="true" /* Only this cell is draggable */
-                      onDragStart={(e) => handleDragStartCharacter(e, character.id)} /* Only this cell starts the drag */
-                    >
-                      {editingCharacterId === character.id ? (
-                        <input
-                          type="text"
-                          value={editedCharacterName}
-                          onChange={handleCharacterNameChange}
-                          onBlur={handleCharacterNameBlur}
-                          onKeyDown={handleCharacterNameKeyDown}
-                          autoFocus
-                          className="character-name-input"
-                          onFocus={(e) => e.target.select()}
-                        />
-                      ) : (
-                        <span>{character.name}</span>
-                      )}
+                {characters.length === 0 ? (
+                  <tr>
+                    <td colSpan={allResourceDefs.length + 1} className="no-characters-message">
+                      숙제 탭에서 캐릭터를 추가해주세요.
                     </td>
-                    {allResourceDefs.map(resourceDef => (
+                  </tr>
+                ) : (
+                  characters.map(character => (
+                    <tr
+                      key={character.id}
+                      onDragOver={(e) => handleDragOverCharacter(e, character.id)}
+                      onDrop={handleDropCharacter}
+                      onDragLeave={handleDragLeaveCharacter}
+                      onDragEnd={handleDragEndCharacter}
+                      className={draggedCharacterId === character.id ? 'dragging-character-row' : dragOverCharacterId === character.id ? 'drag-over-character-row' : ''}
+                    >
                       <td
-                        key={resourceDef.id}
-                        className={`resource-amount-cell ${getResourceAmount(character.id, resourceDef.id) >= resourceDef.maxAmount ? 'resource-full' : ''}`}
-                        onClick={() => handleCellClick(character.id, resourceDef.id)}
+                        className="character-name-cell"
+                        onClick={() => handleCharacterNameClick(character)}
+                        draggable="true"
+                        onDragStart={(e) => handleDragStartCharacter(e, character.id)}
                       >
-                        {editingCell?.characterId === character.id && editingCell?.resourceDefId === resourceDef.id ? (
+                        {editingCharacterId === character.id ? (
                           <input
-                            type="number"
-                            value={editedAmount}
-                            onChange={handleAmountChange}
-                            onBlur={handleAmountBlur}
-                            onKeyDown={handleAmountKeyDown}
+                            type="text"
+                            value={editedCharacterName}
+                            onChange={handleCharacterNameChange}
+                            onBlur={handleCharacterNameBlur}
+                            onKeyDown={handleCharacterNameKeyDown}
                             autoFocus
-                            className="resource-amount-input"
+                            className="character-name-input"
                             onFocus={(e) => e.target.select()}
                           />
                         ) : (
-                          getResourceAmount(character.id, resourceDef.id)
+                          <span>{character.name}</span>
                         )}
                       </td>
-                    ))}
-                  </tr>
-                ))}
+                      {allResourceDefs.map(resourceDef => (
+                        <td
+                          key={resourceDef.id}
+                          className={`resource-amount-cell ${getResourceAmount(character.id, resourceDef.id) >= resourceDef.maxAmount ? 'resource-full' : ''}`}
+                          onClick={() => handleCellClick(character.id, resourceDef.id)}
+                        >
+                          {editingCell?.characterId === character.id && editingCell?.resourceDefId === resourceDef.id ? (
+                            <input
+                              type="number"
+                              value={editedAmount}
+                              onChange={handleAmountChange}
+                              onBlur={handleAmountBlur}
+                              onKeyDown={handleAmountKeyDown}
+                              autoFocus
+                              className="resource-amount-input"
+                              onFocus={(e) => e.target.select()}
+                            />
+                          ) : (
+                            getResourceAmount(character.id, resourceDef.id)
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       )}
-    </div>
+    </div >
   );
 };
-
 export default ResourceView;
