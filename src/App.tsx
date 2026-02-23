@@ -226,39 +226,87 @@ function App() {
 
   // Load reset config from localStorage on initial mount and task definitions/completions
   useEffect(() => {
-    const savedDailyResetHour = localStorage.getItem('aion2-daily-reset-hour');
-    const savedWeeklyResetDay = localStorage.getItem('aion2-weekly-reset-day');
-    const savedWeeklyResetHour = localStorage.getItem('aion2-weekly-reset-hour');
-    const savedDailyResetMinute = localStorage.getItem('aion2-daily-reset-minute');
-    const savedDailyResetSecond = localStorage.getItem('aion2-daily-reset-second');
-    const savedWeeklyResetMinute = localStorage.getItem('aion2-weekly-reset-minute');
-    const savedWeeklyResetSecond = localStorage.getItem('aion2-weekly-reset-second');
+    const checkAndLoadInitialData = async () => {
+      console.log("checkAndLoadInitialData called.");
+      const hasCoreData = (
+        localStorage.getItem('aion2-task-definitions') !== null &&
+        localStorage.getItem('aion2-task-definitions') !== "[]" &&
+        localStorage.getItem('aion2-task-definitions') !== "{}"
+      ) || (
+        localStorage.getItem('aion2-resource-definitions') !== null &&
+        localStorage.getItem('aion2-resource-definitions') !== "[]" &&
+        localStorage.getItem('aion2-resource-definitions') !== "{}"
+      ) || (
+        localStorage.getItem('aion2-characters') !== null &&
+        localStorage.getItem('aion2-characters') !== "[]" &&
+        localStorage.getItem('aion2-characters') !== "{}"
+      );
 
-    if (savedDailyResetHour) setDailyResetHour(parseInt(savedDailyResetHour));
-    if (savedWeeklyResetDay) setWeeklyResetDay(parseInt(savedWeeklyResetDay));
-    if (savedWeeklyResetHour) setWeeklyResetHour(parseInt(savedWeeklyResetHour));
-    if (savedDailyResetMinute) setDailyResetMinute(parseInt(savedDailyResetMinute));
-    if (savedDailyResetSecond) setDailyResetSecond(parseInt(savedDailyResetSecond));
-    if (savedWeeklyResetMinute) setWeeklyResetMinute(parseInt(savedWeeklyResetMinute));
-    if (savedWeeklyResetSecond) setWeeklyResetSecond(parseInt(savedWeeklyResetSecond));
+      console.log("hasCoreData:", hasCoreData);
 
-    // RESTORED character-related checks and loading
-    if (taskDefinitions.length === 0 && characters.length === 0 && characterTaskCompletions.length === 0 && resourceDefinitions.length === 0 && characterResourceStates.length === 0 || dataLoadedKey > 0) { // Check for resource states too
+      if (!hasCoreData) {
+        console.log("Core application data (tasks, resources, characters) is empty. Attempting to load initial data from initial_data.txt");
+        try {
+          const response = await fetch(`${import.meta.env.BASE_URL}initial_data.txt`);
+          console.log("Fetch response status:", response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const initialDataString = await response.text();
+          console.log("Initial data string fetched:", initialDataString);
+          const parsedInitialData = JSON.parse(initialDataString);
+          console.log("Parsed initial data:", parsedInitialData);
+
+          for (const key of ALL_LOCAL_STORAGE_KEYS) {
+            if (parsedInitialData[key] !== undefined && parsedInitialData[key] !== null) {
+              localStorage.setItem(key, parsedInitialData[key]);
+              console.log(`Set localStorage key '${key}' with value:`, parsedInitialData[key]);
+            }
+          }
+          setDataLoadedKey(prev => {
+            console.log("dataLoadedKey incremented.");
+            return prev + 1;
+          }); // Trigger a re-render and re-evaluation
+        } catch (error) {
+          console.error("Failed to load or parse initial data from initial_data.txt", error);
+        }
+      } else {
+        console.log("Core application data exists. Loading from local storage as usual.");
+      }
+      
+      // Load reset config from localStorage
+      const savedDailyResetHour = localStorage.getItem('aion2-daily-reset-hour');
+      const savedWeeklyResetDay = localStorage.getItem('aion2-weekly-reset-day');
+      const savedWeeklyResetHour = localStorage.getItem('aion2-weekly-reset-hour');
+      const savedDailyResetMinute = localStorage.getItem('aion2-daily-reset-minute');
+      const savedDailyResetSecond = localStorage.getItem('aion2-daily-reset-second');
+      const savedWeeklyResetMinute = localStorage.getItem('aion2-weekly-reset-minute');
+      const savedWeeklyResetSecond = localStorage.getItem('aion2-weekly-reset-second');
+
+      if (savedDailyResetHour) setDailyResetHour(parseInt(savedDailyResetHour));
+      if (savedWeeklyResetDay) setWeeklyResetDay(parseInt(savedWeeklyResetDay));
+      if (savedWeeklyResetHour) setWeeklyResetHour(parseInt(savedWeeklyResetHour));
+      if (savedDailyResetMinute) setDailyResetMinute(parseInt(savedDailyResetMinute));
+      if (savedDailyResetSecond) setDailyResetSecond(parseInt(savedDailyResetSecond));
+      if (savedWeeklyResetMinute) setWeeklyResetMinute(parseInt(savedWeeklyResetMinute));
+      if (savedWeeklyResetSecond) setWeeklyResetSecond(parseInt(savedWeeklyResetSecond));
+
+      // Load task definitions, characters, completions, resource definitions, and resource states
       const savedTaskDefinitions = localStorage.getItem('aion2-task-definitions');
-      const savedCharacters = localStorage.getItem('aion2-characters'); // RESTORED
+      const savedCharacters = localStorage.getItem('aion2-characters');
       const savedCompletions = localStorage.getItem('aion2-character-task-completions');
-      const savedResourceDefinitions = localStorage.getItem('aion2-resource-definitions'); // NEW
-      const savedCharacterResourceStates = localStorage.getItem('aion2-character-resource-states'); // NEW
+      const savedResourceDefinitions = localStorage.getItem('aion2-resource-definitions');
+      const savedCharacterResourceStates = localStorage.getItem('aion2-character-resource-states');
 
       let loadedTaskDefinitions: TaskDefinition[] = savedTaskDefinitions ? JSON.parse(savedTaskDefinitions) : initialTaskDefinitions;
-      let loadedCharacters: Character[] = savedCharacters ? JSON.parse(savedCharacters) : []; // RESTORED
+      let loadedCharacters: Character[] = savedCharacters ? JSON.parse(savedCharacters) : [];
       let loadedCompletions: CharacterTaskCompletion[] = savedCompletions ? JSON.parse(savedCompletions) : [];
-      let loadedResourceDefinitions: ResourceDefinition[] = savedResourceDefinitions ? JSON.parse(savedResourceDefinitions) : []; // NEW
-      let loadedCharacterResourceStates: CharacterResourceState[] = savedCharacterResourceStates ? JSON.parse(savedCharacterResourceStates) : []; // NEW
+      let loadedResourceDefinitions: ResourceDefinition[] = savedResourceDefinitions ? JSON.parse(savedResourceDefinitions) : [];
+      let loadedCharacterResourceStates: CharacterResourceState[] = savedCharacterResourceStates ? JSON.parse(savedCharacterResourceStates) : [];
 
       setTaskDefinitions(loadedTaskDefinitions);
-      setCharacters(loadedCharacters); // RESTORED
-      setResourceDefinitions(loadedResourceDefinitions); // NEW
+      setCharacters(loadedCharacters);
+      setResourceDefinitions(loadedResourceDefinitions);
       
       const now = new Date();
       // Apply reset logic on load
@@ -298,9 +346,11 @@ function App() {
 
       // Apply any missed charges to the loaded/initialized resource states
       const updatedOnLoadResourceStates = calculateResourceCharges(processedCharacterResourceStates, loadedResourceDefinitions, now);
-      setCharacterResourceStates(updatedOnLoadResourceStates); // NEW
-    }
-  }, [dataLoadedKey]); // Empty dependency array to run only once on mount for initial load
+      setCharacterResourceStates(updatedOnLoadResourceStates);
+    };
+
+    checkAndLoadInitialData();
+  }, [dataLoadedKey]); // dataLoadedKey dependency ensures that changes to this key trigger a re-render and data re-evaluation.
 
 
   useEffect(() => {
