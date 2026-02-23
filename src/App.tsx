@@ -156,6 +156,8 @@ function App() {
   const [editingTask, setEditingTask] = useState<TaskDefinition | null>(null); // NEW: State to hold task being edited
   const [editingResource, setEditingResource] = useState<ResourceDefinition | null>(null); // NEW: State to hold resource being edited
   const [dataLoadedKey, setDataLoadedKey] = useState(0); // NEW: State to force data reload after import
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null); // NEW: State to store the beforeinstallprompt event
+  const [showInstallButton, setShowInstallButton] = useState(false); // NEW: State to control visibility of install button
 
   const ALL_LOCAL_STORAGE_KEYS = [
     'aion2-daily-reset-hour',
@@ -205,6 +207,21 @@ function App() {
       console.error("Failed to parse import data string:", e);
       return false;
     }
+  };
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      return;
+    }
+    (deferredPrompt as any).prompt();
+    const { outcome } = await (deferredPrompt as any).userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the A2HS prompt');
+    } else {
+      console.log('User dismissed the A2HS prompt');
+    }
+    setDeferredPrompt(null);
+    setShowInstallButton(false);
   };
 
   // Load reset config from localStorage on initial mount and task definitions/completions
@@ -328,6 +345,17 @@ function App() {
     }, 1000);
     return () => clearInterval(timer);
   }, [taskDefinitions, characters, resourceDefinitions, dailyResetHour, dailyResetMinute, dailyResetSecond, weeklyResetDay, weeklyResetHour, weeklyResetMinute, weeklyResetSecond]); // Add resourceDefinitions to dependencies
+
+  // NEW: Effect to listen for PWA beforeinstallprompt event
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('aion2-task-definitions', JSON.stringify(taskDefinitions));
@@ -598,8 +626,13 @@ function App() {
         })()}
       </div>
       <div className="header-controls"> {/* NEW wrapper div for header elements */}
+        {showInstallButton && (
+            <button onClick={handleInstallClick} className="pwa-install-button">
+                PWA 설치
+            </button>
+        )}
         <button className="data-management-button" onClick={() => setShowDataManagementModal(true)}>
-          데이터 관리
+            데이터 관리
         </button>
       </div>
       <h1>아이온2 숙제 관리</h1>

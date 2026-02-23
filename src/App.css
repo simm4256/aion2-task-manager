@@ -1031,3 +1031,18 @@ body.character-dragging-active .homework-table-container tbody td.resource-amoun
 .data-management-button:hover {
   background-color: #4cae4c;
 }
+
+.pwa-install-button {
+  background-color: #007bff; /* Blue, can be adjusted */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.pwa-install-button:hover {
+  background-color: #0056b3;
+}
