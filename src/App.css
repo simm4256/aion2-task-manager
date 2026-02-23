@@ -1,0 +1,1033 @@
+.container {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px;
+  background-color: #2e2e2e;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.current-time {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 0.9em;
+  color: #c9c9c9;
+  z-index: 10;
+}
+
+h1 {
+  text-align: center;
+  color: #a0c4ff;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+/* Task Form Styling (for adding new tasks) */
+.task-form {
+  display: flex;
+  flex-direction: column; /* Changed to column for better overlay layout */
+  gap: 10px;
+  width: 100%;
+  max-width: 300px; /* Constrain width for overlay */
+  padding: 15px;
+  background-color: #3b3b3b;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 auto; /* Center the form if it's the only element */
+}
+
+.task-input,
+.task-type-select {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #4a4a4a;
+  color: #e0e0e0;
+  font-size: 1em;
+}
+
+.task-input::placeholder {
+  color: #b0b0b0;
+}
+
+.task-type-select {
+  flex-grow: 0;
+  cursor: pointer;
+}
+
+.add-task-button {
+  background-color: #a0c4ff;
+  color: #1a1a1a;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-task-button:hover {
+  background-color: #8db0e0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Task Type Radio Group Styling */
+.task-type-radio-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #e0e0e0; /* Consistent text color */
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For IE/Edge */
+  caret-color: transparent; /* Hide blinking cursor */
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #a0c4ff; /* Main accent color for radio buttons */
+  cursor: pointer;
+  width: 16px; /* Adjust size */
+  height: 16px; /* Adjust size */
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+/* Tabs Styling */
+.tabs {
+  width: 100%;
+  margin-top: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-list {
+  display: flex;
+  justify-content: center;
+  border-bottom: 2px solid #555;
+  margin-bottom: 0;
+}
+
+.tab-list-item {
+  background-color: #3b3b3b;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #c9c9c9;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  outline: none; /* Remove default focus outline */
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For IE/Edge */
+  caret-color: transparent; /* Hide blinking cursor */
+}
+
+.tab-list-item:hover {
+  background-color: #555;
+  color: #fff;
+}
+
+.tab-list-item.active {
+  background-color: #4a4a4a; /* Distinct background for active tab */
+  color: #a0c4ff;
+  font-weight: bold;
+}
+
+/* Remove focus outline for tab buttons */
+.tab-list-item:focus,
+.tab-list-item:focus-visible {
+  outline: none;
+}
+
+.tab-panels {
+  padding: 15px;
+  background-color: #2e2e2e;
+  border-radius: 0 0 8px 8px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Character Tab Styling */
+.character-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  flex-grow: 1;
+}
+
+.character-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 50px;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.character-item {
+  background-color: #4a4a4a;
+  padding: 10px 15px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #e0e0e0;
+  font-size: 1.1em;
+  width: 100%;
+}
+
+.character-item span {
+  flex-grow: 1;
+}
+
+.character-delete-button {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  font-size: 0.9em;
+}
+
+.character-delete-button:hover {
+  background-color: #e04848;
+}
+
+.no-characters {
+  text-align: center;
+  color: #b0b0b0;
+  font-style: italic;
+  padding: 10px;
+  margin-top: 50px;
+}
+
+.character-add-section {
+  display: flex;
+  justify-content: center; /* Center the button and form */
+  margin-top: auto; /* Push to bottom */
+  padding-top: 20px; /* Space from list */
+}
+
+.add-character-btn {
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+  font-size: 1.8em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-in-out;
+  z-index: 1;
+}
+
+.add-character-btn:hover {
+  background-color: #4cae4c;
+}
+
+.character-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+  padding: 15px;
+  background-color: #3b3b3b;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.character-input {
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #4a4a4a;
+  color: #e0e0e0;
+  font-size: 1em;
+}
+
+/* Homework Tab Specific Styling */
+.homework-tab-content {
+  position: relative;
+  padding-top: 50px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Resource Tab Specific Styling (matching Homework Tab for consistent layout) */
+.resource-tab-content {
+  position: relative;
+  padding-top: 50px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-task-definition-btn:hover {
+  background-color: #4cae4c;
+}
+
+/* Action buttons container for HomeworkView */
+.action-buttons-container {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Space between buttons */
+  margin-bottom: 20px; /* Space below buttons */
+  position: absolute; /* Position relative to .homework-tab-content */
+  top: 10px;
+  right: 10px;
+  z-index: 1; /* Ensure buttons are above other content */
+}
+
+/* Style for the new add character button */
+.add-character-definition-btn {
+  background-color: #5cb85c; /* Green, similar to add task button */
+  color: white;
+  border: none;
+  padding: 8px 15px; /* Adjust padding to fit text */
+  border-radius: 5px;
+  font-size: 1em; /* Adjust font size */
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-character-definition-btn:hover {
+  background-color: #4cae4c; /* Darker green on hover */
+}
+
+/* Adjust the existing add task button to match new style */
+.add-task-definition-btn {
+  background-color: #a0c4ff; /* A distinct color for task addition, e.g., blue */
+  color: #1a1a1a;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 1em;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-task-definition-btn:hover {
+  background-color: #8db0e0;
+}
+
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.no-characters-for-homework, .no-tasks-for-homework {
+  text-align: center;
+  color: #b0b0b0;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Table Styling for HomeworkView */
+.homework-table-wrapper {
+  overflow: hidden; /* Hide overflow initially */
+  display: flex; /* Use flex to manage height of inner scrollable area */
+  flex-direction: column;
+  border-radius: 8px;
+  background-color: #3b3b3b;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 10px;
+}
+
+.homework-table-container {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  position: relative; /* For sticky elements */
+}
+
+.homework-table-container table {
+  width: 100%; /* Occupy full width within its container */
+  border-collapse: separate; /* Allows border-spacing, but we'll manage with cell borders */
+  border-spacing: 0;
+  min-width: fit-content; /* Allow table to grow beyond container width if needed */
+  table-layout: fixed; /* Ensures uniform column widths */
+}
+
+.homework-table-container th,
+.homework-table-container td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #4a4a4a;
+  border-right: 1px solid #4a4a4a;
+  color: #e0e0e0;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For IE/Edge */
+  caret-color: transparent; /* Hide blinking cursor */
+}
+
+.homework-table-container th:last-child,
+.homework-table-container td:last-child {
+  border-right: none; /* No border on the last column */
+}
+
+.homework-table-container thead th {
+  background-color: #2e2e2e;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Ensure header is above scrolling content */
+  color: #a0c4ff; /* New text color for header cells */
+}
+
+.homework-table-container tbody tr:last-child td {
+  border-bottom: none; /* No bottom border on last row */
+}
+
+.character-header,
+.character-name-cell {
+  width: 120px; /* Fixed width for character name column */
+  min-width: 120px; /* Ensure it doesn't shrink */
+  position: sticky;
+  left: 0;
+  background-color: #3b3b3b; /* Background for sticky column */
+  z-index: 15; /* Higher z-index for sticky character column */
+  border-right: 1px solid #4a4a4a;
+  cursor: grab; /* Make character name cell draggable */
+  transition: background-color 0.1s ease-in-out; /* Add transition for smooth hover */
+}
+
+/* Add new styles for character-delete-button */
+.character-name-content {
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Arrange children vertically */
+  justify-content: center; /* Center content horizontally (now centers the column) */
+  align-items: center; /* Center content vertically (now centers items within column) */
+  position: relative; /* For absolute positioning of the delete button */
+  height: 100%; /* Ensure it takes full height of the cell */
+}
+
+.character-name-content .character-delete-button { /* Changed selector */
+  position: absolute;
+  top: 50%; /* Center vertically */
+  right: 5px; /* Position to the right */
+  transform: translateY(-50%); /* Adjust for perfect vertical centering */
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  width: 18px; /* Slightly smaller than task delete button */
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.7em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  opacity: 0; /* Hidden by default */
+  pointer-events: none; /* Do not capture clicks when hidden */
+  transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.character-name-content:hover .character-delete-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.character-name-content .character-delete-button:hover { /* Selector remains the same for button hover */
+  background-color: #e04848;
+}
+
+/* Adjust z-index for the character header to be above other sticky headers when scrolling */
+.character-header {
+  z-index: 20; 
+  background-color: #2e2e2e; /* Match header background */
+}
+
+.task-header,
+.task-completion-cell {
+  min-width: 100px; /* Minimum width for task columns */
+  position: relative; /* For delete button positioning */
+  cursor: pointer; /* Indicate clickable cell */
+}
+
+/* Drag and Drop Styling for Task Headers */
+.task-header {
+  cursor: grab; /* Indicate draggable */
+  transition: background-color 0.1s ease-in-out;
+}
+
+/* Specific task header highlight on hover */
+.homework-table-container thead th.task-header:hover {
+  background-color: #555555; /* A distinct highlight for the hovered task header */
+}
+
+.task-header.dragging {
+  opacity: 0.5; /* Visual feedback for dragging item */
+  border: 2px dashed #a0c4ff;
+  background-color: #555555;
+}
+
+.task-header.drag-over {
+  border-bottom: 2px solid #a0c4ff; /* Indicator for drop target */
+}
+
+
+
+
+
+.task-header:active {
+  cursor: grabbing; /* Indicate active grabbing */
+}
+
+.task-header-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.task-header-name {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.task-reset-countdown {
+  font-size: 0.7em;
+  color: #b0b0b0;
+}
+
+/* Styling for resource charge info to match task reset countdown */
+.resource-charge-info {
+  font-size: 0.7em;
+  color: #b0b0b0;
+}
+
+.task-definition-delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  opacity: 0; /* Hidden by default */
+  pointer-events: none; /* Do not capture clicks when hidden */
+  transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.task-header:hover .task-definition-delete-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.task-definition-delete-button:hover {
+  background-color: #e04848;
+}
+
+.task-completion-cell input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #a0c4ff;
+  cursor: pointer;
+}
+
+/* Weekly Task Specific Styling */
+.weekly-task-header .task-header-name {
+  color: #ffa500; /* Orange color for weekly task header name */
+}
+
+.weekly-task-cell input[type="checkbox"] {
+  accent-color: #ffa500; /* Orange color for weekly task checkboxes */
+}
+
+/* Custom Task Specific Styling */
+.custom-task-header .task-header-name {
+  color: #8A2BE2; /* BlueViolet color for custom task header name */
+}
+
+.custom-task-cell input[type="checkbox"] {
+  accent-color: #8A2BE2; /* BlueViolet color for custom task checkboxes */
+}
+
+/* Resource Header Specific Styling (matching task-header for drag/drop and hover) */
+.resource-header {
+  min-width: 100px; /* Minimum width for resource columns */
+  position: relative; /* For delete button positioning */
+  cursor: grab; /* Indicate draggable */
+  transition: background-color 0.1s ease-in-out;
+}
+
+/* Specific resource header highlight on hover */
+.homework-table-container thead th.resource-header:hover {
+  background-color: #555555; /* A distinct highlight for the hovered resource header */
+}
+
+.resource-header.dragging {
+  opacity: 0.5; /* Visual feedback for dragging item */
+  border: 2px dashed #a0c4ff;
+  background-color: #555555;
+}
+
+.resource-header.drag-over {
+  border-bottom: 2px solid #a0c4ff; /* Indicator for drop target */
+}
+
+.resource-header:active {
+  cursor: grabbing; /* Indicate active grabbing */
+}
+
+.resource-definition-delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  opacity: 0; /* Hidden by default */
+  pointer-events: none; /* Do not capture clicks when hidden */
+  transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.resource-header:hover .resource-definition-delete-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.resource-definition-delete-button:hover {
+  background-color: #e04848;
+}
+
+/* Disable default hover effects when character dragging is active */
+body.character-dragging-active .homework-table-container tbody tr:hover td,
+body.character-dragging-active .homework-table-container tbody tr:hover .character-name-cell,
+body.character-dragging-active .homework-table-container tbody tr:hover td.character-name-cell:hover,
+body.character-dragging-active .homework-table-container tbody td.task-completion-cell:hover,
+body.character-dragging-active .homework-table-container tbody td.resource-amount-cell:hover {
+  background-color: transparent !important;
+  transition: none !important;
+  cursor: grabbing; /* Indicate grabbing cursor during drag */
+}
+
+/* Hover effect for rows and cells */
+.homework-table-container tbody tr:hover td {
+  background-color: #4a4a4a; /* Lighter shade on hover for rows */
+  transition: background-color 0.1s ease-in-out;
+}
+
+/* Specific cell highlight on hover for task completion and resource amount cells */
+.homework-table-container tbody td.task-completion-cell:hover,
+.homework-table-container tbody td.resource-amount-cell:hover {
+  background-color: #585858; /* Slightly different highlight for the hovered cell */
+}
+
+/* Ensure sticky character name cell also gets row hover background */
+/* When the row is hovered, the character name cell should get the general row hover color */
+.homework-table-container tbody tr:hover .character-name-cell {
+  background-color: #4a4a4a; /* Consistent row hover color */
+}
+
+/* Apply specific hover color to character name cell itself when directly hovered */
+.homework-table-container tbody tr:hover td.character-name-cell:hover {
+  background-color: #585858 !important; /* Specific highlight for directly hovered character name cell */
+}
+
+/* Style for resource cells when full */
+.resource-amount-cell.resource-full {
+  color: #ff6b6b; /* Red color */
+  font-weight: bold;
+}
+
+.resource-not-full-small {
+  color: #5cb85c; /* Green color for not-full resources */
+  font-weight: bold;
+}
+
+.character-resources-display {
+  font-size: 0.75em; /* Smaller font size */
+  color: #b0b0b0; /* Lighter color */
+  margin-top: 2px; /* Small margin from character name */
+  display: block; /* Ensure it takes its own line */
+}
+
+.character-resource-item {
+  margin-right: 5px; /* Space between each resource item */
+}
+
+/* Styles for resource amount in character display */
+.resource-full-small {
+  color: #ff6b6b; /* Red color for full resources */
+  font-weight: bold;
+}
+
+.resource-not-full-small {
+  color: #5cb85c; /* Green color for not-full resources */
+  font-weight: bold;
+}
+
+/* Styling for images in task/resource headers */
+.task-image,
+.resource-image {
+  max-width: 100%;
+  max-height: 24px; /* Adjust as needed to fit header height */
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle; /* Align image vertically in middle */
+  margin: 0 auto; /* Center image if space allows */
+}
+
+/* Styling for small images in character resource display */
+.resource-image-small {
+  max-width: 18px; /* Adjust to fit small display area */
+  max-height: 18px;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* Image Selection Gallery for Forms */
+.image-selection-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+  justify-content: center;
+  padding: 5px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #4a4a4a;
+}
+
+.image-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px; /* Fixed size for options */
+  height: 50px;
+  border: 2px solid transparent; /* Keep transparent border for layout, but visually it's gone */
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3b3b3b;
+  opacity: 0.6; /* Default opacity */
+  transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* Transition opacity */
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.image-option:hover {
+  background-color: #555;
+  opacity: 0.8; /* Hover opacity */
+  border-color: transparent; /* Keep border transparent on hover unless selected */
+}
+
+.image-option.selected {
+  border: 2px solid #a0c4ff; /* Strong visual for selected, using border */
+  background-color: #555;
+  opacity: 1; /* Selected opacity */
+}
+
+.image-option img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+/* Container for image with overlay text */
+.image-overlay-container {
+  position: relative;
+  display: inline-flex; /* Use inline-flex to shrink to content, or flex for block */
+  align-items: center;
+  justify-content: center;
+}
+
+.image-overlay-container .form-preview-image {
+  max-width: 50px;
+  max-height: 50px;
+  object-fit: contain;
+  display: block; /* Remove extra space below image */
+}
+
+/* Base style for overlay text */
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* White text */
+  font-weight: bold;
+  font-size: 1.2em; /* Rollback to em unit */
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000; /* Black border effect */
+  pointer-events: none; /* Allow clicks to pass through to the image */
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For IE/Edge */
+  caret-color: transparent; /* Hide blinking cursor */
+}
+
+/* Smaller overlay text for character resources */
+.small-overlay-text {
+  font-size: 0.8em; /* Rollback to em unit */
+  text-shadow:
+    -0.5px -0.5px 0 #000,
+     0.5px -0.5px 0 #000,
+    -0.5px  0.5px 0 #000,
+     0.5px  0.5px 0 #000; /* Smaller border effect */
+}
+
+/* Character item drag and drop styles */
+.character-item.dragging {
+  opacity: 0.4; /* 드래그되는 아이템에 대한 시각적 피드백 */
+  border: 2px dashed #a0c4ff;
+  background-color: #555555;
+  transform: scale(1.02); /* 드래그 시 약간 확대 */
+}
+
+.character-item {
+  transition: transform 0.2s ease-in-out; /* 다른 아이템들의 부드러운 애니메이션을 위한 트랜지션 유지 */
+}
+
+/* Character name input field style */
+.character-name-input {
+  width: calc(100% - 10px); /* Adjust width to fit padding */
+  padding: 5px;
+  border: 1px solid #a0c4ff;
+  border-radius: 4px;
+  background-color: #3b3b3b;
+  color: #e0e0e0;
+  font-size: 1em;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.character-name-input:focus {
+  outline: none;
+  border-color: #7abaff;
+}
+
+.drop-indicator {
+  height: 2px;
+  background-color: #a0c4ff; /* Accent color for the indicator */
+  margin: 5px 0; /* Space above and below the indicator */
+  animation: pulse 1s infinite alternate; /* Optional: subtle animation */
+}
+
+@keyframes pulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+/* Character row drag and drop styles */
+.homework-table-container tbody tr.dragging-character-row {
+  opacity: 0.5;
+  background-color: #4a4a4a; /* A slightly different shade for visibility */
+  border-top: 2px dashed #a0c4ff; /* Match accent color */
+  border-bottom: 2px dashed #a0c4ff;
+}
+
+.homework-table-container tbody tr.drag-over-character-row {
+  background-color: #555555; /* Highlight background */
+  border-bottom: 2px solid #a0c4ff; /* Visual indicator for drop position */
+}
+
+/* Styles for visually hovered character row during drag */
+.homework-table-container tbody tr.visually-hovered-character-row td {
+  background-color: #4a4a4a; /* Matches the general row hover background */
+  transition: background-color 0.1s ease-in-out;
+}
+
+.homework-table-container tbody tr.visually-hovered-character-row td.character-name-cell {
+  background-color: #585858 !important; /* Specific highlight for the character name cell */
+}
+
+/* Reset configs */
+.reset-config-modal-content {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 400px;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.reset-config-modal-content h2 {
+  color: #a0c4ff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.reset-config-modal-content label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ccc;
+}
+
+.reset-config-modal-content input[type="number"],
+.reset-config-modal-content select {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #444;
+  color: #eee;
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.reset-config-modal-content .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.reset-config-modal-content button {
+  background-color: #a0c4ff;
+  color: #1a1a1a;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.reset-config-modal-content button:hover {
+  background-color: #8db0e0;
+}
+
+.reset-config-modal-content .cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.reset-config-modal-content .cancel-button:hover {
+  background-color: #5a6268;
+}
+
+
+.header-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px; /* Space between elements */
+  align-items: center;
+  z-index: 10;
+}
+
+.data-management-button {
+  background-color: #5cb85c; /* Green, can be adjusted */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.data-management-button:hover {
+  background-color: #4cae4c;
+}

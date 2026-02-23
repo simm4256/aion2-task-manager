@@ -1,0 +1,87 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  height: 100%; /* Make root fill height */
+}
+
+body {
+  margin: 0;
+  display: flex;
+  /* place-items: center; Removed to allow app to fill space */
+  /* min-width: 320px; Removed for full flexibility */
+  min-height: 100vh;
+  background-color: #1a1a1a; /* Darker background for the body */
+  height: 100%; /* Make body fill height */
+
+  /* Prevent text cursor globally */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Re-enable text cursor and selection for input elements */
+input,
+textarea,
+[contenteditable="true"] { /* Add contenteditable for completeness, though not explicitly requested */
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  cursor: text;
+}
+
+#root {
+  /* max-width: 1280px; Removed to allow app to fill width */
+  margin: 0; /* Remove auto margin */
+  padding: 0; /* Adjust padding in App.css container */
+  /* text-align: center; Removed for flexible layout */
+  width: 100%; /* Make root fill width */
+  height: 100%; /* Make root fill height */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}

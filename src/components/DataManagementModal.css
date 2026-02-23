@@ -1,0 +1,99 @@
+/* src/components/DataManagementModal.css */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-content h2 {
+  color: #4CAF50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.data-section h3 {
+  color: #eee;
+  margin-bottom: 5px;
+}
+
+.data-section button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.data-section button:hover {
+  background-color: #0056b3;
+}
+
+.data-section textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  background-color: #444;
+  color: #eee;
+  resize: vertical;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-actions button:hover {
+  background-color: #5a6268;
+}
+
+.error-message {
+  color: #ff4d4d;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #4CAF50;
+  margin-top: 10px;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>드래그 앤 드롭 테이블 행</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>드래그 앤 드롭 테이블 행 예제</h1>
+    <table id="draggable-table">
+        <thead>
+            <tr>
+                <th>순서</th>
+                <th>항목</th>
+                <th>설명</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr draggable="true" data-id="1">
+                <td>1</td>
+                <td>첫 번째 행</td>
+                <td>이것은 첫 번째 데이터입니다.</td>
+            </tr>
+            <tr draggable="true" data-id="2">
+                <td>2</td>
+                <td>두 번째 행</td>
+                <td>이것은 두 번째 데이터입니다.</td>
+            </tr>
+            <tr draggable="true" data-id="3">
+                <td>3</td>
+                <td>세 번째 행</td>
+                <td>이것은 세 번째 데이터입니다.</td>
+            </tr>
+            <tr draggable="true" data-id="4">
+                <td>4</td>
+                <td>네 번째 행</td>
+                <td>이것은 네 번째 데이터입니다.</td>
+            </tr>
+            <tr draggable="true" data-id="5">
+                <td>5</td>
+                <td>다섯 번째 행</td>
+                <td>이것은 다섯 번째 데이터입니다.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
