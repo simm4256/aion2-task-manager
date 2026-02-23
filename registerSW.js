@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/aion2-task-manager/sw.js', { scope: '/aion2-task-manager/' })})}
