@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import type { TaskDefinition, TaskType, CharacterTaskCompletion } from './types/Task.ts';
+import type { TaskDefinition, TaskType, TaskInputType, CharacterTaskCompletion } from './types/Task.ts';
 // @ts-ignore
 import type { ResourceDefinition, CharacterResourceState } from './types/Resource.ts'; // New import
 import HomeworkView from './components/HomeworkView'; // New component for Homework tab
@@ -18,10 +18,10 @@ import { isSameDay, getResetCheckPoint, getMostRecentDailyResetPoint, getNextCus
 import DataManagementModal from './components/DataManagementModal'; // NEW import
 
 const initialTaskDefinitions: TaskDefinition[] = [
-  { id: uuidv4(), name: '일일 퀘스트 A', type: 'daily' },
-  { id: uuidv4(), name: '일일 퀘스트 B', type: 'daily' },
-  { id: uuidv4(), name: '주간 던전 C', type: 'weekly' },
-  { id: uuidv4(), name: '주간 전장 D', type: 'weekly' },
+  { id: uuidv4(), name: '일일 퀘스트 A', type: 'daily', inputType: 'check' },
+  { id: uuidv4(), name: '일일 퀘스트 B', type: 'daily', inputType: 'check' },
+  { id: uuidv4(), name: '주간 던전 C', type: 'weekly', inputType: 'check' },
+  { id: uuidv4(), name: '주간 전장 D', type: 'weekly', inputType: 'check' },
 ];
 
 const resetTasks = (
@@ -69,7 +69,7 @@ const resetTasks = (
     } // Closes the 'else if (taskDef.type === 'custom')' block
 
     if (needsReset) {
-      return { ...completion, completed: false, lastResetDate: now.toISOString() };
+      return { ...completion, completed: false, currentCount: 0, lastResetDate: now.toISOString() };
     }
     return completion;
   });
@@ -448,10 +448,21 @@ function App() {
     );
   };
 
+  const handleUpdateCount = (characterId: string, taskDefinitionId: string, newCount: number) => {
+    setCharacterTaskCompletions(prevCompletions =>
+      prevCompletions.map(completion =>
+        completion.characterId === characterId && completion.taskDefinitionId === taskDefinitionId
+          ? { ...completion, currentCount: newCount }
+          : completion
+      )
+    );
+  };
+
   const handleSaveTask = (
     id: string | undefined,
     name: string,
     type: TaskType,
+    inputType: TaskInputType,
     resetDays?: number[], // New: Array of numbers (0-6, Sun-Sat)
     resetTime?: string,   // New: Time in "HH:mm" format
     imageUrl?: string,
@@ -466,6 +477,7 @@ function App() {
                 ...taskDef,
                 name,
                 type,
+                inputType,
                 resetDays: type === 'custom' ? resetDays : undefined,
                 resetTime: type === 'custom' ? resetTime : undefined,
                 imageUrl: imageUrl || undefined,
@@ -480,6 +492,7 @@ function App() {
         id: uuidv4(),
         name,
         type,
+        inputType,
         ...(type === 'custom' && { resetDays, resetTime }),
         imageUrl: imageUrl || undefined,
         displayFirstLetterOnImage: displayFirstLetterOnImage || undefined,
@@ -495,6 +508,7 @@ function App() {
             characterId: char.id,
             taskDefinitionId: newTaskDef.id,
             completed: false,
+            currentCount: 0,
             lastResetDate: now.toISOString(),
           }));
           return [...prevCompletions, ...newCompletions];
@@ -528,6 +542,7 @@ function App() {
                     characterId: newCharacter.id,
                     taskDefinitionId: taskDef.id,
                     completed: false,
+                    currentCount: 0,
                     lastResetDate: now.toISOString(),        }));
         return [...prevCompletions, ...newCharacterCompletions];
       });
@@ -696,6 +711,7 @@ function App() {
                         resourceDefinitions={resourceDefinitions} // NEW PROP
                         characterResourceStates={characterResourceStates} // NEW PROP
                         onToggleCompletion={handleToggleCompletion}
+                        onUpdateCount={handleUpdateCount} // NEW PROP
                         onDeleteTaskDefinition={handleDeleteTaskDefinition}
                         onAddCharacter={handleAddCharacter} // RESTORED
                         onDeleteCharacter={handleDeleteCharacter} // RESTORED

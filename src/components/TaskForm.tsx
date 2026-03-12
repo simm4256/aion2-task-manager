@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { TaskType, TaskDefinition } from '../types/Task.ts';
+import type { TaskType, TaskDefinition, TaskInputType } from '../types/Task.ts';
 import { availableImages, getImageUrl } from '../utils/image-helpers.ts';
 
 interface TaskFormProps {
@@ -8,6 +8,7 @@ interface TaskFormProps {
     id: string | undefined,
     name: string,
     type: TaskType,
+    inputType: TaskInputType, // Added inputType
     resetDays?: number[], // New: Array of numbers (0-6, Sun-Sat)
     resetTime?: string,   // New: Time in "HH:mm" format
     imageUrl?: string,
@@ -19,6 +20,7 @@ interface TaskFormProps {
 const TaskForm: React.FC<TaskFormProps> = ({ initialTask, onSaveTask, onCancel }) => {
   const [taskName, setTaskName] = useState(initialTask ? initialTask.name : '');
   const [taskType, setTaskType] = useState<TaskType>(initialTask ? initialTask.type : 'daily');
+  const [taskInputType, setTaskInputType] = useState<TaskInputType>(initialTask ? initialTask.inputType : 'check'); // New state
   const [selectedResetDays, setSelectedResetDays] = useState<number[]>(initialTask?.resetDays || []);
   const [resetTime, setResetTime] = useState<string>(initialTask?.resetTime || '00:00');
   const [imageUrl, setImageUrl] = useState(initialTask ? initialTask.imageUrl : '');
@@ -28,6 +30,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialTask, onSaveTask, onCancel }
   useEffect(() => {
     setTaskName(initialTask ? initialTask.name : '');
     setTaskType(initialTask ? initialTask.type : 'daily');
+    setTaskInputType(initialTask ? initialTask.inputType : 'check');
     setSelectedResetDays(initialTask?.resetDays || []);
     setResetTime(initialTask?.resetTime || '00:00');
     setImageUrl(initialTask ? initialTask.imageUrl : '');
@@ -55,6 +58,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialTask, onSaveTask, onCancel }
         initialTask ? initialTask.id : undefined,
         taskName.trim(),
         taskType,
+        taskInputType, // Pass inputType
         taskType === 'custom' ? selectedResetDays : undefined,
         taskType === 'custom' ? resetTime : undefined,
         imageUrl,
@@ -128,6 +132,32 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialTask, onSaveTask, onCancel }
           )}
         </div>
       )}
+
+      <p style={{ marginTop: '10px', fontWeight: 'bold' }}>입력 유형:</p>
+      <div className="task-type-radio-group">
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="taskInputType"
+            value="check"
+            checked={taskInputType === 'check'}
+            onChange={() => setTaskInputType('check')}
+          />
+          체크형
+        </label>
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="taskInputType"
+            value="count"
+            checked={taskInputType === 'count'}
+            onChange={() => setTaskInputType('count')}
+          />
+          카운트형
+        </label>
+      </div>
+
+      <p style={{ marginTop: '10px', fontWeight: 'bold' }}>초기화 주기:</p>
       <div className="task-type-radio-group">
         <label className="radio-label">
           <input

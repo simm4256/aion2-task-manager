@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Character } from '../types/Character.ts';
-import type { TaskDefinition, CharacterTaskCompletion } from '../types/Task.ts';
+import type { TaskDefinition, CharacterTaskCompletion, TaskInputType } from '../types/Task.ts';
 import type { ResourceDefinition, CharacterResourceState } from '../types/Resource.ts'; // NEW IMPORT
 import { getTimeRemainingUntilReset } from '../utils/date-helpers';
 import { getImageUrl } from '../utils/image-helpers';
@@ -13,6 +13,7 @@ interface HomeworkViewProps {
   resourceDefinitions: ResourceDefinition[]; // NEW PROP
   characterResourceStates: CharacterResourceState[]; // NEW PROP
   onToggleCompletion: (characterId: string, taskDefinitionId: string) => void;
+  onUpdateCount: (characterId: string, taskDefinitionId: string, newCount: number) => void; // NEW PROP
   onDeleteTaskDefinition: (taskDefinitionId: string) => void;
   onAddCharacter: (name: string) => void; // RESTORED
   onDeleteCharacter: (characterId: string) => void; // RESTORED
@@ -40,6 +41,7 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
   resourceDefinitions, // NEW PROP
   characterResourceStates, // NEW PROP
   onToggleCompletion,
+  onUpdateCount, // NEW PROP
   onDeleteTaskDefinition,
   onAddCharacter, // RESTORED
   onDeleteCharacter, // RESTORED
@@ -74,6 +76,9 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
   const [isCharacterDraggingActive, setIsCharacterDraggingActive] = useState<boolean>(false); // New state for global drag active
   const [visuallyHoveredCharacterId, setVisuallyHoveredCharacterId] = useState<string | null>(null); // New state for visual hover
 
+  // State for count-type task dragging
+  const [dragCountInfo, setDragCountInfo] = useState<{ characterId: string, taskDefId: string, startY: number, startCount: number } | null>(null);
+
   // State for character name editing
   const [editingCharacterId, setEditingCharacterId] = useState<string | null>(null);
   const [editedCharacterName, setEditedCharacterName] = useState<string>('');
@@ -82,6 +87,54 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
     return characterTaskCompletions.find(
       c => c.characterId === characterId && c.taskDefinitionId === taskDefinitionId
     )?.completed || false;
+  };
+
+  const getTaskCount = (characterId: string, taskDefinitionId: string) => {
+    return characterTaskCompletions.find(
+      c => c.characterId === characterId && c.taskDefinitionId === taskDefinitionId
+    )?.currentCount || 0;
+  };
+
+  // Drag logic for count-type tasks
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragCountInfo) return;
+
+      const diffY = dragCountInfo.startY - e.clientY;
+      const step = 10; // 10px moving up/down changes count by 1
+      const countDiff = Math.round(diffY / step);
+      const newCount = Math.max(0, dragCountInfo.startCount + countDiff);
+
+      if (newCount !== getTaskCount(dragCountInfo.characterId, dragCountInfo.taskDefId)) {
+        onUpdateCount(dragCountInfo.characterId, dragCountInfo.taskDefId, newCount);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setDragCountInfo(null);
+    };
+
+    if (dragCountInfo) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragCountInfo, onUpdateCount, characterTaskCompletions]);
+
+  const handleMouseDownCount = (e: React.MouseEvent, characterId: string, taskDefId: string) => {
+    // Only left click for drag
+    if (e.button !== 0) return;
+    
+    setDragCountInfo({
+      characterId,
+      taskDefId,
+      startY: e.clientY,
+      startCount: getTaskCount(characterId, taskDefId)
+    });
   };
 
   // Character Name Editing Handlers
@@ -439,19 +492,57 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                         </button>
                       </div>
                     </td>
-                    {allTaskDefs.map(taskDef => (
-                      <td
-                        key={taskDef.id}
-                        className={`task-completion-cell ${taskDef.type === 'weekly' ? 'weekly-task-cell' : ''} ${taskDef.type === 'custom' ? 'custom-task-cell' : ''}`}
-                        onClick={() => onToggleCompletion(character.id, taskDef.id)}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={getCompletionStatus(character.id, taskDef.id)}
-                          onChange={(e) => e.stopPropagation()}
-                        />
-                      </td>
-                    ))}
+                    {allTaskDefs.map(taskDef => {
+                      const isCountType = taskDef.inputType === 'count';
+                      return (
+                        <td
+                          key={taskDef.id}
+                          className={`task-completion-cell ${taskDef.type === 'weekly' ? 'weekly-task-cell' : ''} ${taskDef.type === 'custom' ? 'custom-task-cell' : ''} ${isCountType ? 'count-type-cell' : ''}`}
+                          onClick={() => {
+                            if (!isCountType) {
+                              onToggleCompletion(character.id, taskDef.id);
+                            } else {
+                              // For count type, single click increments
+                              onUpdateCount(character.id, taskDef.id, getTaskCount(character.id, taskDef.id) + 1);
+                            }
+                          }}
+                          onContextMenu={(e) => {
+                            if (isCountType) {
+                              e.preventDefault();
+                              const currentCount = getTaskCount(character.id, taskDef.id);
+                              onUpdateCount(character.id, taskDef.id, Math.max(0, currentCount - 1));
+                            }
+                          }}
+                          onMouseDown={(e) => {
+                            if (isCountType) {
+                              handleMouseDownCount(e, character.id, taskDef.id);
+                            }
+                          }}
+                        >
+                          {isCountType ? (
+                            <div className="count-cell-content">
+                              <span className="count-value">{getTaskCount(character.id, taskDef.id)}</span>
+                              <button
+                                className="count-reset-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onUpdateCount(character.id, taskDef.id, 0);
+                                }}
+                                title="초기화"
+                              >
+                                ↻
+                              </button>
+                            </div>
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={getCompletionStatus(character.id, taskDef.id)}
+                              onChange={(e) => e.stopPropagation()}
+                            />
+                          )}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))
                 )}
