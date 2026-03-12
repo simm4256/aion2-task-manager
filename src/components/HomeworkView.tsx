@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Character } from '../types/Character.ts';
-import type { TaskDefinition, CharacterTaskCompletion, TaskInputType } from '../types/Task.ts';
+import type { TaskDefinition, CharacterTaskCompletion } from '../types/Task.ts';
 import type { ResourceDefinition, CharacterResourceState } from '../types/Resource.ts'; // NEW IMPORT
 import { getTimeRemainingUntilReset } from '../utils/date-helpers';
 import { getImageUrl } from '../utils/image-helpers';
