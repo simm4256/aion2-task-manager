@@ -348,6 +348,18 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
   };
 
 
+  const maxCountsPerTask: { [taskDefId: string]: number } = {};
+  taskDefinitions.forEach(taskDef => {
+    if (taskDef.inputType === 'count') {
+      const countsForTask = characterTaskCompletions
+        .filter(completion => completion.taskDefinitionId === taskDef.id)
+        .map(completion => completion.currentCount);
+      // Ensure that if there are no counts (e.g., no characters yet), max is 0, not -Infinity from Math.max()
+      maxCountsPerTask[taskDef.id] = countsForTask.length > 0 ? Math.max(...countsForTask) : 0;
+    }
+  });
+
+
   return (
     <div className="homework-tab-content">
       <div className="action-buttons-container">
@@ -494,6 +506,9 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                     </td>
                     {allTaskDefs.map(taskDef => {
                       const isCountType = taskDef.inputType === 'count';
+                      const currentCount = getTaskCount(character.id, taskDef.id);
+                      const isMaxCount = isCountType && currentCount === maxCountsPerTask[taskDef.id] && currentCount > 0; // Only highlight if count > 0
+
                       return (
                         <td
                           key={taskDef.id}
@@ -521,7 +536,7 @@ const HomeworkView: React.FC<HomeworkViewProps> = ({
                         >
                           {isCountType ? (
                             <div className="count-cell-content">
-                              <span className="count-value">{getTaskCount(character.id, taskDef.id)}</span>
+                              <span className={`count-value ${isMaxCount ? 'count-value-max' : 'count-value-normal'}`}>{currentCount}</span>
                               <button
                                 className="count-reset-button"
                                 onClick={(e) => {
