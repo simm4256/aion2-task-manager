@@ -14,16 +14,25 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
   const [time, setTime] = useState<string>(initialAlarm?.time ?? '00:00');
   const [dayOfWeek, setDayOfWeek] = useState<number>(initialAlarm?.dayOfWeek ?? 1); // 기본 월요일(1)
   const [notifyBefore, setNotifyBefore] = useState({
-    atTime: initialAlarm?.notifyBefore.atTime ?? true, // 기본값 true
+    atTime: initialAlarm?.notifyBefore.atTime ?? true,
     thirtySec: initialAlarm?.notifyBefore.thirtySec ?? false,
     oneMin: initialAlarm?.notifyBefore.oneMin ?? false,
     threeMin: initialAlarm?.notifyBefore.threeMin ?? false,
     fiveMin: initialAlarm?.notifyBefore.fiveMin ?? false,
   });
+  const [ttsVoice, setTtsVoice] = useState(initialAlarm?.ttsVoice ?? '');
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
+
+    const loadVoices = () => {
+      setVoices(window.speechSynthesis.getVoices());
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,6 +50,7 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
       minute: type === 'hourly' ? minute : undefined,
       time: type !== 'hourly' ? time : undefined,
       dayOfWeek: type === 'weekly' ? dayOfWeek : undefined,
+      ttsVoice,
       notifyBefore,
       isEnabled: initialAlarm ? initialAlarm.isEnabled : true,
     };
@@ -108,7 +118,7 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
         </label>
       </div>
 
-      <div className="alarm-time-options" style={{ marginTop: '10px' }}>
+      <div className="alarm-time-options" style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
         {type === 'hourly' && (
           <div>
             <label>매시 </label>
@@ -201,6 +211,46 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
           />
           5분 전
         </label>
+      </div>
+
+      <p style={{ marginTop: '15px', fontWeight: 'bold' }}>TTS 음성 설정:</p>
+      <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+        <select
+          value={ttsVoice}
+          onChange={(e) => setTtsVoice(e.target.value)}
+          onWheel={(e) => {
+            const select = e.currentTarget;
+            if (e.deltaY > 0) {
+              if (select.selectedIndex < select.options.length - 1) select.selectedIndex++;
+            } else {
+              if (select.selectedIndex > 0) select.selectedIndex--;
+            }
+            setTtsVoice(select.value);
+            e.preventDefault();
+          }}
+          className="task-input"
+          style={{ flex: 1, minWidth: '0' }}
+        >
+          <option value="">기본 음성</option>
+          {voices.map(voice => (
+            <option key={voice.name} value={voice.name}>{voice.name}</option>
+          ))}
+        </select>
+        <button 
+          type="button" 
+          onClick={() => {
+            window.speechSynthesis.cancel(); // 이전 재생 중단
+            const utterance = new SpeechSynthesisUtterance(`${name || '테스트'} 알람입니다.`);
+            utterance.lang = 'ko-KR';
+            const voice = voices.find(v => v.name === ttsVoice);
+            if (voice) utterance.voice = voice;
+            window.speechSynthesis.speak(utterance);
+          }}
+          className="reset-button"
+          style={{ backgroundColor: '#ffadad', color: '#2e2e2e', padding: '5px 10px', flexShrink: 0 }}
+        >
+          테스트
+        </button>
       </div>
 
       <div className="form-actions" style={{ marginTop: '20px' }}>

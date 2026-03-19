@@ -185,10 +185,18 @@ function App() {
   ];
 
   // TTS 재생 함수
-  const speak = (text: string) => {
+  const speak = (text: string, voiceName?: string) => {
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // 이전 재생 중단
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
+
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === voiceName);
+      if (voice) {
+        utterance.voice = voice;
+      }
+
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -250,7 +258,7 @@ function App() {
         // 마지막 재생 후 5초 이상 경과했을 때만 실행 (중복 방지)
         if (nowTime - lastPlayed > 5000) {
           console.log(`[ALARM] ${alarm.name} (${diffSec}s): ${msgSuffix} (Target: ${targetDate.toLocaleTimeString()})`);
-          speak(`${alarm.name} ${msgSuffix}`);
+          speak(`${alarm.name} ${msgSuffix}`, alarm.ttsVoice);
           setActiveAlarmId(alarm.id);
           setTimeout(() => setActiveAlarmId(null), 5000);
           

@@ -7,6 +7,7 @@ export interface AlarmDefinition {
   minute?: number;       // 매시 x분 (0-59)
   time?: string;         // HH:mm 형식 (매일/매주)
   dayOfWeek?: number;    // 요일 (0-6, 일-토)
+  ttsVoice?: string;     // 알람별 개별 TTS 음성 설정
   notifyBefore: {
     fiveMin: boolean;    // 5분 전
     threeMin: boolean;   // 3분 전
