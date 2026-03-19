@@ -11,8 +11,12 @@ import ResetConfigModal from './components/ResetConfigModal'; // New import
 import type { Character } from './types/Character.ts'; // RESTORED
 import CharacterForm from './components/CharacterForm'; // RESTORED
 import ResourceView from './components/ResourceView'; // New import
-import ResourceForm from './components/ResourceForm'; // New import
+import ResourceForm from './components/ResourceForm';
+import AlarmView from './components/AlarmView';
+import AlarmForm from './components/AlarmForm';
+import type { AlarmDefinition } from './types/Alarm.ts';
 import { v4 as uuidv4 } from 'uuid';
+
 // @ts-ignore
 import { isSameDay, getResetCheckPoint, getMostRecentDailyResetPoint, getNextCustomResetTime, getNextWeeklyResetTime, getMostRecentWeeklyResetPoint } from './utils/date-helpers';
 import DataManagementModal from './components/DataManagementModal'; // NEW import
@@ -144,6 +148,11 @@ function App() {
   const [showCharacterForm, setShowCharacterForm] = useState(false); // RESTORED
   const [showTaskDefinitionForm, setShowTaskDefinitionForm] = useState(false);
   const [showResourceDefinitionForm, setShowResourceDefinitionForm] = useState(false); // New state for resource form visibility
+  const [showAlarmForm, setShowAlarmForm] = useState(false); // NEW state for alarm form visibility
+  const [alarms, setAlarms] = useState<AlarmDefinition[]>([]); // NEW state for alarms
+  const [editingAlarm, setEditingAlarm] = useState<AlarmDefinition | null>(null); // NEW: State to hold alarm being edited
+  const [activeAlarmId, setActiveAlarmId] = useState<string | null>(null); // NEW: 현재 울리고 있는 알람 ID
+  const [lastPlayedAlarms, setLastPlayedAlarms] = useState<{ [key: string]: number }>({}); // NEW: 중복 재생 방지
   const [showResetConfigModal, setShowResetConfigModal] = useState(false);
   const [dailyResetHour, setDailyResetHour] = useState(5); // Default to 5 AM
   const [dailyResetMinute, setDailyResetMinute] = useState(0);
@@ -172,7 +181,88 @@ function App() {
     'aion2-character-task-completions',
     'aion2-resource-definitions',
     'aion2-character-resource-states',
+    'aion2-alarms', // NEW key
   ];
+
+  // TTS 재생 함수
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // 알람 시각 체크 함수 (초 단위 정밀도)
+  const checkAlarms = (now: Date) => {
+    const currentDay = now.getDay();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentSecond = now.getSeconds();
+    const nowTime = now.getTime();
+
+    // 알람 목록이 없으면 즉시 종료
+    if (alarms.length === 0) return;
+
+    alarms.forEach(alarm => {
+      if (!alarm.isEnabled) return;
+
+      let targetHour = 0;
+      let targetMinute = 0;
+      let isToday = false;
+
+      if (alarm.type === 'hourly') {
+        targetHour = currentHour;
+        targetMinute = Number(alarm.minute) || 0;
+        if (targetMinute < currentMinute || (targetMinute === currentMinute && currentSecond > 0)) {
+          targetHour = (currentHour + 1) % 24;
+        }
+        isToday = true;
+      } else if (alarm.type === 'daily' || alarm.type === 'weekly') {
+        const [h, m] = (alarm.time || '00:00').split(':').map(Number);
+        targetHour = h;
+        targetMinute = m;
+        isToday = (alarm.type === 'daily') || (alarm.type === 'weekly' && Number(alarm.dayOfWeek) === currentDay);
+      }
+
+      if (!isToday) return;
+
+      const targetDate = new Date(now);
+      targetDate.setHours(targetHour, targetMinute, 0, 0);
+      
+      if (targetDate.getTime() < nowTime - 1000) {
+        if (alarm.type === 'daily') targetDate.setDate(targetDate.getDate() + 1);
+        else if (alarm.type === 'weekly') targetDate.setDate(targetDate.getDate() + 7);
+      }
+
+      const diffSec = Math.round((targetDate.getTime() - nowTime) / 1000);
+
+      // 울려야 할 포인트들 (diffSec : 메시지 접미사)
+      const triggerPoints: { [key: number]: string } = {};
+      if (alarm.notifyBefore.atTime) triggerPoints[0] = '시간입니다.';
+      if (alarm.notifyBefore.thirtySec) triggerPoints[30] = '30초 전입니다.';
+      if (alarm.notifyBefore.oneMin) triggerPoints[60] = '1분 전입니다.';
+      if (alarm.notifyBefore.threeMin) triggerPoints[180] = '3분 전입니다.';
+      if (alarm.notifyBefore.fiveMin) triggerPoints[300] = '5분 전입니다.';
+
+      // 현재 diffSec이 트리거 포인트 중 하나인지 확인
+      const msgSuffix = triggerPoints[diffSec];
+      if (msgSuffix) {
+        const playKey = `${alarm.id}-${diffSec}`;
+        const lastPlayed = lastPlayedAlarms[playKey] || 0;
+        
+        // 마지막 재생 후 5초 이상 경과했을 때만 실행 (중복 방지)
+        if (nowTime - lastPlayed > 5000) {
+          console.log(`[ALARM] ${alarm.name} (${diffSec}s): ${msgSuffix}`);
+          speak(`${alarm.name} ${msgSuffix}`);
+          setActiveAlarmId(alarm.id);
+          setTimeout(() => setActiveAlarmId(null), 5000);
+          
+          setLastPlayedAlarms(prev => ({ ...prev, [playKey]: nowTime }));
+        }
+      }
+    });
+  };
 
   const exportAllData = () => {
     const allData: { [key: string]: string | null } = {};
@@ -297,16 +387,19 @@ function App() {
       const savedCompletions = localStorage.getItem('aion2-character-task-completions');
       const savedResourceDefinitions = localStorage.getItem('aion2-resource-definitions');
       const savedCharacterResourceStates = localStorage.getItem('aion2-character-resource-states');
+      const savedAlarms = localStorage.getItem('aion2-alarms');
 
       let loadedTaskDefinitions: TaskDefinition[] = savedTaskDefinitions ? JSON.parse(savedTaskDefinitions) : initialTaskDefinitions;
       let loadedCharacters: Character[] = savedCharacters ? JSON.parse(savedCharacters) : [];
       let loadedCompletions: CharacterTaskCompletion[] = savedCompletions ? JSON.parse(savedCompletions) : [];
       let loadedResourceDefinitions: ResourceDefinition[] = savedResourceDefinitions ? JSON.parse(savedResourceDefinitions) : [];
       let loadedCharacterResourceStates: CharacterResourceState[] = savedCharacterResourceStates ? JSON.parse(savedCharacterResourceStates) : [];
+      let loadedAlarms: AlarmDefinition[] = savedAlarms ? JSON.parse(savedAlarms) : [];
 
       setTaskDefinitions(loadedTaskDefinitions);
       setCharacters(loadedCharacters);
       setResourceDefinitions(loadedResourceDefinitions);
+      setAlarms(loadedAlarms);
       
       const now = new Date();
       // Apply reset logic on load
@@ -363,6 +456,7 @@ function App() {
       const currentSecond = now.getSeconds();
 
       if (currentSecond !== lastCheckedSecond) {
+        checkAlarms(now); // NEW: Check alarms every second (but logic handles 00s)
         // RESTORED characters.length > 0 check
         if (taskDefinitions.length > 0 && characters.length > 0) {
           setCharacterTaskCompletions(prevCompletions => {
@@ -658,6 +752,12 @@ function App() {
     setWeeklyResetSecond(weeklySecond);
   };
 
+  const handleSetTestDailyReset = (hour: number, minute: number, second: number) => {
+    setDailyResetHour(hour);
+    setDailyResetMinute(minute);
+    setDailyResetSecond(second);
+  };
+
   // NEW: handleEditTaskDefinition function
   const handleEditTaskDefinition = (taskDefinition: TaskDefinition) => {
     setEditingTask(taskDefinition);
@@ -670,11 +770,38 @@ function App() {
     setShowResourceDefinitionForm(true);
   };
 
-  const handleSetTestDailyReset = (hour: number, minute: number, second: number) => {
-    setDailyResetHour(hour);
-    setDailyResetMinute(minute);
-    setDailyResetSecond(second);
+  const handleSaveAlarm = (alarm: AlarmDefinition) => {
+    setAlarms(prev => {
+      const exists = prev.find(a => a.id === alarm.id);
+      if (exists) {
+        return prev.map(a => a.id === alarm.id ? alarm : a);
+      }
+      return [...prev, alarm];
+    });
+    setShowAlarmForm(false);
+    setEditingAlarm(null);
   };
+
+  const handleDeleteAlarm = (id: string) => {
+    setAlarms(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleToggleAlarm = (id: string) => {
+    setAlarms(prev => prev.map(a => a.id === id ? { ...a, isEnabled: !a.isEnabled } : a));
+  };
+
+  const handleEditAlarm = (alarm: AlarmDefinition) => {
+    setEditingAlarm(alarm);
+    setShowAlarmForm(true);
+  };
+
+  const handleTestTTS = () => {
+    speak('테스트입니다.');
+  };
+
+  useEffect(() => {
+    localStorage.setItem('aion2-alarms', JSON.stringify(alarms));
+  }, [alarms]);
 
   return (
     <div className="container">
@@ -755,6 +882,18 @@ function App() {
             currentTime={currentTime} // NEW PROP
           />
         </Tab>
+        {/* NEW Alarm Tab */}
+        <Tab label="알람">
+          <AlarmView 
+            alarms={alarms}
+            onDeleteAlarm={handleDeleteAlarm}
+            onToggleAlarm={handleToggleAlarm}
+            onEditAlarm={handleEditAlarm}
+            setShowAlarmForm={setShowAlarmForm} 
+            onTestTTS={handleTestTTS}
+            activeAlarmId={activeAlarmId}
+          />
+        </Tab>
       </Tabs>
 
       {showResetConfigModal && (
@@ -809,6 +948,20 @@ function App() {
       {showCharacterForm && (
         <div className="form-overlay">
           <CharacterForm onAddCharacter={handleAddCharacter} onCancel={() => setShowCharacterForm(false)} />
+        </div>
+      )}
+
+      {/* Conditional rendering for AlarmForm */}
+      {showAlarmForm && (
+        <div className="form-overlay">
+          <AlarmForm
+            initialAlarm={editingAlarm || undefined}
+            onSaveAlarm={handleSaveAlarm}
+            onCancel={() => {
+              setShowAlarmForm(false);
+              setEditingAlarm(null);
+            }}
+          />
         </div>
       )}
 
