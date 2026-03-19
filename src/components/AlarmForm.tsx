@@ -28,7 +28,12 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
     inputRef.current?.focus();
 
     const loadVoices = () => {
-      setVoices(window.speechSynthesis.getVoices());
+      const allVoices = window.speechSynthesis.getVoices();
+      // 한국어(ko)인 음성만 필터링
+      const filteredVoices = allVoices.filter(voice => 
+        voice.lang.toLowerCase().startsWith('ko')
+      );
+      setVoices(filteredVoices);
     };
 
     loadVoices();
@@ -240,7 +245,8 @@ const AlarmForm: React.FC<AlarmFormProps> = ({ initialAlarm, onSaveAlarm, onCanc
           type="button" 
           onClick={() => {
             window.speechSynthesis.cancel(); // 이전 재생 중단
-            const utterance = new SpeechSynthesisUtterance(`${name || '테스트'} 알람입니다.`);
+            const text = name.trim() ? `${name.trim()} 시간입니다.` : '테스트입니다.';
+            const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'ko-KR';
             const voice = voices.find(v => v.name === ttsVoice);
             if (voice) utterance.voice = voice;

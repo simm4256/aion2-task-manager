@@ -7,7 +7,6 @@ interface AlarmViewProps {
   onToggleAlarm: (id: string) => void;
   onEditAlarm: (alarm: AlarmDefinition) => void;
   setShowAlarmForm: (show: boolean) => void;
-  onTestTTS: () => void;
   activeAlarmId?: string | null; // 추가
 }
 
@@ -17,7 +16,6 @@ const AlarmView: React.FC<AlarmViewProps> = ({
   onToggleAlarm, 
   onEditAlarm, 
   setShowAlarmForm,
-  onTestTTS,
   activeAlarmId // 추가
 }) => {
   const getDayLabel = (day?: number) => {
@@ -45,13 +43,6 @@ const AlarmView: React.FC<AlarmViewProps> = ({
   return (
     <div className="alarm-tab-content">
       <div className="action-buttons-container" style={{ display: 'flex', gap: '10px' }}>
-        <button 
-          onClick={onTestTTS} 
-          className="add-task-definition-btn"
-          style={{ backgroundColor: '#ffadad', color: '#2e2e2e' }}
-        >
-          테스트
-        </button>
         <button 
           onClick={() => setShowAlarmForm(true)} 
           className="add-task-definition-btn"

@@ -799,10 +799,6 @@ function App() {
     setShowAlarmForm(true);
   };
 
-  const handleTestTTS = () => {
-    speak('테스트입니다.');
-  };
-
   useEffect(() => {
     localStorage.setItem('aion2-alarms', JSON.stringify(alarms));
   }, [alarms]);
@@ -894,7 +890,6 @@ function App() {
             onToggleAlarm={handleToggleAlarm}
             onEditAlarm={handleEditAlarm}
             setShowAlarmForm={setShowAlarmForm} 
-            onTestTTS={handleTestTTS}
             activeAlarmId={activeAlarmId}
           />
         </Tab>
