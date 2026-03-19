@@ -195,10 +195,6 @@ function App() {
 
   // 알람 시각 체크 함수 (초 단위 정밀도)
   const checkAlarms = (now: Date) => {
-    const currentDay = now.getDay();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const currentSecond = now.getSeconds();
     const nowTime = now.getTime();
 
     // 알람 목록이 없으면 즉시 종료
@@ -207,35 +203,35 @@ function App() {
     alarms.forEach(alarm => {
       if (!alarm.isEnabled) return;
 
-      let targetHour = 0;
-      let targetMinute = 0;
-      let isToday = false;
+      let targetDate = new Date(now);
 
       if (alarm.type === 'hourly') {
-        targetHour = currentHour;
-        targetMinute = Number(alarm.minute) || 0;
-        if (targetMinute < currentMinute || (targetMinute === currentMinute && currentSecond > 0)) {
-          targetHour = (currentHour + 1) % 24;
+        const targetMinute = Number(alarm.minute) || 0;
+        targetDate.setSeconds(0, 0);
+        targetDate.setMinutes(targetMinute);
+        
+        // 현재 시각보다 목표 시각이 과거라면 다음 시간으로 설정
+        if (targetDate.getTime() <= nowTime - 1000) {
+          targetDate.setHours(targetDate.getHours() + 1);
         }
-        isToday = true;
       } else if (alarm.type === 'daily' || alarm.type === 'weekly') {
         const [h, m] = (alarm.time || '00:00').split(':').map(Number);
-        targetHour = h;
-        targetMinute = m;
-        isToday = (alarm.type === 'daily') || (alarm.type === 'weekly' && Number(alarm.dayOfWeek) === currentDay);
+        targetDate.setHours(h, m, 0, 0);
+
+        if (alarm.type === 'weekly') {
+          const targetDay = Number(alarm.dayOfWeek);
+          const diffDays = (targetDay - targetDate.getDay() + 7) % 7;
+          targetDate.setDate(targetDate.getDate() + diffDays);
+        }
+
+        // 현재 시각보다 목표 시각이 과거라면 다음 날/주로 설정
+        if (targetDate.getTime() <= nowTime - 1000) {
+          targetDate.setDate(targetDate.getDate() + (alarm.type === 'daily' ? 1 : 7));
+        }
       }
 
-      if (!isToday) return;
-
-      const targetDate = new Date(now);
-      targetDate.setHours(targetHour, targetMinute, 0, 0);
-      
-      if (targetDate.getTime() < nowTime - 1000) {
-        if (alarm.type === 'daily') targetDate.setDate(targetDate.getDate() + 1);
-        else if (alarm.type === 'weekly') targetDate.setDate(targetDate.getDate() + 7);
-      }
-
-      const diffSec = Math.round((targetDate.getTime() - nowTime) / 1000);
+      // 차이 계산 (초 단위)
+      const diffSec = Math.floor((targetDate.getTime() - nowTime) / 1000);
 
       // 울려야 할 포인트들 (diffSec : 메시지 접미사)
       const triggerPoints: { [key: number]: string } = {};
@@ -247,13 +243,13 @@ function App() {
 
       // 현재 diffSec이 트리거 포인트 중 하나인지 확인
       const msgSuffix = triggerPoints[diffSec];
-      if (msgSuffix) {
-        const playKey = `${alarm.id}-${diffSec}`;
+      if (msgSuffix !== undefined) {
+        const playKey = `${alarm.id}-${diffSec}-${targetDate.getTime()}`;
         const lastPlayed = lastPlayedAlarms[playKey] || 0;
         
         // 마지막 재생 후 5초 이상 경과했을 때만 실행 (중복 방지)
         if (nowTime - lastPlayed > 5000) {
-          console.log(`[ALARM] ${alarm.name} (${diffSec}s): ${msgSuffix}`);
+          console.log(`[ALARM] ${alarm.name} (${diffSec}s): ${msgSuffix} (Target: ${targetDate.toLocaleTimeString()})`);
           speak(`${alarm.name} ${msgSuffix}`);
           setActiveAlarmId(alarm.id);
           setTimeout(() => setActiveAlarmId(null), 5000);
@@ -488,7 +484,7 @@ function App() {
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [taskDefinitions, characters, resourceDefinitions, dailyResetHour, dailyResetMinute, dailyResetSecond, weeklyResetDay, weeklyResetHour, weeklyResetMinute, weeklyResetSecond]); // Add resourceDefinitions to dependencies
+  }, [taskDefinitions, characters, resourceDefinitions, dailyResetHour, dailyResetMinute, dailyResetSecond, weeklyResetDay, weeklyResetHour, weeklyResetMinute, weeklyResetSecond, alarms]); // Add alarms to dependencies
 
   // NEW: Effect to listen for PWA beforeinstallprompt event
   useEffect(() => {
