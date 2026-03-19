@@ -123,8 +123,8 @@ const calculateResourceCharges = (
       tempChargeTime.setTime(tempChargeTime.getTime() - chargeCycleMillis);
     }
     
-    // Ensure amount does not exceed maxAmount
-    newAmount = Math.min(newAmount, resourceDef.maxAmount);
+    // Ensure amount does not exceed maxAmount and does not fall below 0
+    newAmount = Math.max(0, Math.min(newAmount, resourceDef.maxAmount));
 
     if (count > 0) {
       return { ...state, currentAmount: newAmount, lastUpdateTime: newLastUpdateTime.toISOString() };

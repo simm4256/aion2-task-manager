@@ -93,7 +93,7 @@ const ResourceView: React.FC<ResourceViewProps> = ({
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedAmount(parseInt(e.target.value) || 0);
+    setEditedAmount(Math.max(0, parseInt(e.target.value) || 0));
   };
 
   const handleAmountBlur = () => {
